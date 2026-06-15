@@ -24,6 +24,9 @@ A modern task management application designed to help users organize tasks, trac
 ## 🌐 Live Demo
 
 https://thanusha-r.github.io/todo-pro-app/
+## 📸 Screenshot
+
+![Portfolio Screenshot](todopro-home.png)
 
 ## ▶️ How to Run
 
