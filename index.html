@@ -411,6 +411,15 @@ button,input,select{font-family:inherit;}
   border-radius:5px;
 }
 .sblbl{font-size:.65rem;font-weight:700;color:#52516a;}
+ .rembtn{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:600;
+} 
 </style>
 </head>
 <body>
@@ -536,6 +545,9 @@ button,input,select{font-family:inherit;}
       <div class="sbs"><strong id="sD">0</strong><small>Done</small></div>
       <div class="sbs"><strong id="sO">0</strong><small>Late</small></div>
     </div>
+    <button class="rembtn" onclick="toggleReminders()">
+  🔔 Reminders: ON
+</button>
     <button class="lgbtn" onclick="logout()">🚪 Sign Out</button>
   </aside>
   <main class="mn">
@@ -848,7 +860,33 @@ window.onload=function(){
   if(s){CU=s;openApp();}
 };
 
+let remindersEnabled =
+localStorage.getItem("remindersEnabled") !== "false";
 
+function toggleReminders() {
+    remindersEnabled = !remindersEnabled;
+
+    const btn = document.querySelector(".rembtn");
+
+    btn.innerHTML = remindersEnabled
+        ? "🔔 Reminders: ON"
+        : "🔕 Reminders: OFF";
+
+    localStorage.setItem(
+        "remindersEnabled",
+        remindersEnabled
+    );
+}
+
+window.addEventListener("load", () => {
+    const btn = document.querySelector(".rembtn");
+
+    if(btn){
+        btn.innerHTML = remindersEnabled
+            ? "🔔 Reminders: ON"
+            : "🔕 Reminders: OFF";
+    }
+});
 </script>
 </body>
 </html>
