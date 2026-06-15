@@ -412,6 +412,16 @@ button,input,select{font-family:inherit;}
 }
 .sblbl{font-size:.65rem;font-weight:700;color:#52516a;}
 } 
+  .notif-btn{
+  width:100%;padding:.68rem;
+  background:rgba(109,40,217,.08);
+  color:#a78bfa;
+  border:1px solid rgba(109,40,217,.2);
+  border-radius:10px;font-size:.84rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  letter-spacing:-.1px;margin-bottom:.5rem;
+}
+.notif-btn:hover{background:rgba(109,40,217,.18);}
 </style>
 </head>
 <body>
@@ -537,6 +547,7 @@ button,input,select{font-family:inherit;}
       <div class="sbs"><strong id="sD">0</strong><small>Done</small></div>
       <div class="sbs"><strong id="sO">0</strong><small>Late</small></div>
     </div>
+    <button class="notif-btn" onclick="requestNotificationPermission()">🔔 Enable Reminders</button>
     <button class="lgbtn" onclick="logout()">🚪 Sign Out</button>
   </aside>
   <main class="mn">
@@ -842,40 +853,55 @@ function showAlt(msg,type){
 }
 
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&CU)addTask();});
+function requestNotificationPermission(){
+  if(!('Notification' in window)){
+    alert('Your browser does not support notifications!');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    sendNotification('✅ Reminders Active!','You will be notified before tasks are due.');
+    return;
+  }
+  if(Notification.permission==='denied'){
+    alert('Notifications blocked!\nClick 🔒 lock icon → Notifications → Allow');
+    return;
+  }
+  Notification.requestPermission().then(function(p){
+    if(p==='granted') sendNotification('✅ Reminders Enabled!','You will be notified before tasks are due.');
+  });
+}
 
+function sendNotification(title,body){
+  if(Notification.permission==='granted'){
+    new Notification(title,{body:body});
+  }
+}
+
+function checkDeadlines(){
+  if(!CU)return;
+  var todos=gt();
+  todos.forEach(function(t){
+    if(t.completed)return;
+    var due=new Date(t.date+'T'+t.time);
+    var now=new Date();
+    var diffMins=(due-now)/60000;
+    if(diffMins>0&&diffMins<=60){
+      sendNotification('⏰ Task Due Soon!','"'+t.text+'" is due in '+Math.round(diffMins)+' minutes!');
+    }
+    if(diffMins<0&&diffMins>-2){
+      sendNotification('🔴 Task Overdue!','"'+t.text+'" is now overdue!');
+    }
+  });
+}
+
+setInterval(checkDeadlines,60000);
 
 window.onload=function(){
   var s=JSON.parse(localStorage.getItem('tp_s'));
   if(s){CU=s;openApp();}
 };
 
-let remindersEnabled =
-localStorage.getItem("remindersEnabled") !== "false";
 
-function toggleReminders() {
-    remindersEnabled = !remindersEnabled;
-
-    const btn = document.querySelector(".rembtn");
-
-    btn.innerHTML = remindersEnabled
-        ? "🔔 Reminders: ON"
-        : "🔕 Reminders: OFF";
-
-    localStorage.setItem(
-        "remindersEnabled",
-        remindersEnabled
-    );
-}
-
-window.addEventListener("load", () => {
-    const btn = document.querySelector(".rembtn");
-
-    if(btn){
-        btn.innerHTML = remindersEnabled
-            ? "🔔 Reminders: ON"
-            : "🔕 Reminders: OFF";
-    }
-});
 </script>
 </body>
 </html>
